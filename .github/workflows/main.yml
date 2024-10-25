@@ -19,11 +19,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3  # 更新至 v3
     - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2  # 更新至 v2
       with:
-        java-version: 1.8
+        java-version: '1.8'
     - name: current date
       run: date
     - name: Build with Maven
@@ -32,8 +32,8 @@ jobs:
       run: java -jar target/bing-wallpaper-jar-with-dependencies.jar
     - name: Commit files
       run: |
-         git config --local user.email "niumoo@126.com"
-         git config --local user.name "niumoo"
+         git config --local user.email "ju.moon@qq.com"
+         git config --local user.name "jumoon2023"
          git pull
          git add README.md
          git add bing-wallpaper.md
@@ -42,7 +42,7 @@ jobs:
          git add zh-cn/*
          git commit -m "update readme.md"
     - name: Push changes
-      uses:  ad-m/github-push-action@master
+      uses: ad-m/github-push-action@master
       with:
-         github_token: ${{ secrets.MY_GIT_TOKEN }}
+         github_token: ${{ secrets.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 }}
          branch: main
