@@ -2,11 +2,9 @@ name: Download and Archive Wallpapers
 
 on:
   schedule:
-    - cron:  '12 7 * * *'
-    # 每天中国时间0点2分 (UTC时间前一天16点2分)
-    - cron:  '12 16 * * *'
-    # 每天UTC时间0点2分
-    - cron:  '12 0 * * *'
+    - cron:  '12 7 * * *' #北京时间 15:12
+    - cron:  '12 16 * * *' #北京时间 00:12（次日）
+    - cron:  '12 0 * * *' #北京时间 08:12
   workflow_dispatch:     # 允许手动触发
 
 jobs:
