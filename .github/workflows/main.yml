@@ -58,5 +58,5 @@ jobs:
         git config --local user.email "ju.moon@qq.com"
         git config --local user.name "GitHub Actions Bot"
         git add bing-wallpaper-*.md archive/
-        git commit -m "Auto-update: Latest wallpapers (CN+EN) + archives [skip ci]" || echo "No changes to commit"
+        git commit -m "Auto-update: Latest wallpapers (CN+EN) + Archives" || echo "No changes to commit"
         git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/bing-wallpaper.git
