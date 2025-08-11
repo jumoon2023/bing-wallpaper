@@ -44,10 +44,10 @@ jobs:
     - name: Clean up old archives
       run: |
         # 删除30天前的中文归档
-        find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +30 -delete
+        find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +180 -delete
         
         # 删除30天前的英文归档
-        find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
+        find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +180 -delete
 
     - name: Commit and push changes
       env:
