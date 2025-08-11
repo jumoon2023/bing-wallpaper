@@ -1,0 +1,39 @@
+name: Download and Archive Wallpaper
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天UTC时间0点(北京时间8点)运行
+  workflow_dispatch:     # 允许手动触发
+
+jobs:
+  download-and-archive:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download latest file
+      run: |
+        # 下载最新文件并覆盖主文件
+        curl -s -o bing-wallpaper.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/bing-wallpaper.md
+        
+        # 创建带日期的副本
+        TODAY=$(date +'%Y-%m-%d')
+        cp bing-wallpaper.md "archive/bing-wallpaper-$TODAY.md"
+
+    - name: Clean up old archives (keep last 30 days)
+      run: |
+        # 创建archive目录如果不存在
+        mkdir -p archive
+        
+        # 删除30天前的文件
+        find archive/ -name "bing-wallpaper-*.md" -type f -mtime +30 -delete
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add bing-wallpaper.md archive/
+        git commit -m "Update wallpaper and archive [skip ci]" || echo "No changes to commit"
+        git push
