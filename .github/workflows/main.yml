@@ -2,16 +2,24 @@ name: Download and Archive Wallpaper
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天UTC时间0点(北京时间8点)运行
+    - cron: '0 0 * * *'  # 每天UTC时间0点运行（北京时间早上8点）
   workflow_dispatch:     # 允许手动触发
 
 jobs:
   download-and-archive:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write    # 授予写入权限
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        persist-credentials: true  # 保持推送凭证
+
+    - name: Create archive directory
+      run: mkdir -p archive  # 确保archive目录存在
 
     - name: Download latest file
       run: |
@@ -22,18 +30,17 @@ jobs:
         TODAY=$(date +'%Y-%m-%d')
         cp bing-wallpaper.md "archive/bing-wallpaper-$TODAY.md"
 
-    - name: Clean up old archives (keep last 30 days)
+    - name: Clean up old archives
       run: |
-        # 创建archive目录如果不存在
-        mkdir -p archive
-        
-        # 删除30天前的文件
+        # 删除30天前的文件（保留最近30天的归档）
         find archive/ -name "bing-wallpaper-*.md" -type f -mtime +30 -delete
 
     - name: Commit and push changes
-      run: |
-        git config --local user.email "ju.moon@qq.com"
-        git config --local user.name "jumoon2023"
-        git add bing-wallpaper.md archive/
-        git commit -m "Update wallpaper and archive [skip ci]" || echo "No changes to commit"
-        git push
+  env:
+    GH_TOKEN: ${{ secrets.PAT }}  # 需要在仓库Settings中配置PAT
+  run: |
+    git config --local user.email "ju.moon@qq.com"
+    git config --local user.name "GitHub Actions Bot"
+    git add bing-wallpaper.md archive/
+    git commit -m "Auto-update: Latest wallpaper + archive [skip ci]" || echo "No changes to commit"
+    git push https://$GH_TOKEN@github.com/jumoon2023/bing-wallpaper.git
