@@ -1,4 +1,4 @@
-name: Download and Archive Wallpaper
+name: Download and Archive Wallpapers
 
 on:
   schedule:
@@ -18,22 +18,36 @@ jobs:
       with:
         persist-credentials: true  # 保持推送凭证
 
-    - name: Create archive directory
-      run: mkdir -p archive  # 确保archive目录存在
-
-    - name: Download latest file
+    - name: Create archive directories
       run: |
-        # 下载最新文件并覆盖主文件
-        curl -s -o bing-wallpaper.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/bing-wallpaper.md
+        mkdir -p archive/cn
+        mkdir -p archive/en
+
+    - name: Download Chinese version
+      run: |
+        # 下载中文版文件
+        curl -s -o bing-wallpaper-cn.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/zh-cn/bing-wallpaper.md
         
-        # 创建带日期的副本
+        # 创建带日期的中文版副本
         TODAY=$(date +'%Y-%m-%d')
-        cp bing-wallpaper.md "archive/bing-wallpaper-$TODAY.md"
+        cp bing-wallpaper-cn.md "archive/cn/bing-wallpaper-cn-$TODAY.md"
+
+    - name: Download English version
+      run: |
+        # 下载英文版文件
+        curl -s -o bing-wallpaper-en.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/bing-wallpaper.md
+        
+        # 创建带日期的英文版副本
+        TODAY=$(date +'%Y-%m-%d')
+        cp bing-wallpaper-en.md "archive/en/bing-wallpaper-en-$TODAY.md"
 
     - name: Clean up old archives
       run: |
-        # 删除30天前的文件（保留最近30天的归档）
-        find archive/ -name "bing-wallpaper-*.md" -type f -mtime +30 -delete
+        # 删除30天前的中文归档
+        find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +30 -delete
+        
+        # 删除30天前的英文归档
+        find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
 
     - name: Commit and push changes
       env:
@@ -41,6 +55,6 @@ jobs:
       run: |
         git config --local user.email "ju.moon@qq.com"
         git config --local user.name "GitHub Actions Bot"
-        git add bing-wallpaper.md archive/
-        git commit -m "Auto-update: Latest wallpaper + archive [skip ci]" || echo "No changes to commit"
+        git add bing-wallpaper-*.md archive/
+        git commit -m "Auto-update: Latest wallpapers (CN+EN) + archives [skip ci]" || echo "No changes to commit"
         git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/bing-wallpaper.git
