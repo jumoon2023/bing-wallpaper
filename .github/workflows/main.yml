@@ -36,11 +36,11 @@ jobs:
         find archive/ -name "bing-wallpaper-*.md" -type f -mtime +30 -delete
 
     - name: Commit and push changes
-  env:
-    GH_TOKEN: ${{ secrets.PAT }}  # 需要在仓库Settings中配置PAT
-  run: |
-    git config --local user.email "ju.moon@qq.com"
-    git config --local user.name "GitHub Actions Bot"
-    git add bing-wallpaper.md archive/
-    git commit -m "Auto-update: Latest wallpaper + archive [skip ci]" || echo "No changes to commit"
-    git push https://$GH_TOKEN@github.com/jumoon2023/bing-wallpaper.git
+      env:
+        GH_TOKEN: ${{ secrets.PAT }}  # 需要在仓库Settings中配置PAT
+      run: |
+        git config --local user.email "ju.moon@qq.com"
+        git config --local user.name "jumoon2023"
+        git add bing-wallpaper.md archive/
+        git commit -m "Auto-update: Latest wallpaper + archive [skip ci]" || echo "No changes to commit"
+        git push https://$GH_TOKEN@github.com/jumoon2023/bing-wallpaper.git
