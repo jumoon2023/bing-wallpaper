@@ -67,9 +67,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT }}
         run: |
-          git config --local user.email "kkkkkk@qq.com"
+          git config --local user.email "ju.moon@qq.com"
           git config --local user.name "GitHub Actions Bot"
           git add bing-wallpaper-*.md archive/
           # 如果没有变动则不报错，直接结束本步骤
           git commit -m "Auto-update: Latest wallpapers (CN+EN) + Archives" || echo "No changes to commit"
-          git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/kkkkkkk.git
+          git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/bing-wallpaper.git
