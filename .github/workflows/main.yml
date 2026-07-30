@@ -2,7 +2,7 @@ name: Download and Archive Wallpapers
 
 on:
   schedule:
-    # 说明：下面三条 cron 都是 UTC 时间，对应北京时间如注释所示
+    # 下面三条 cron 均为 UTC 时间，对应北京时间如注释所示
     - cron: '12 7 * * *'   # 北京时间 15:12
     - cron: '12 16 * * *'  # 北京时间 00:12（次日）
     - cron: '12 0 * * *'   # 北京时间 08:12
@@ -11,34 +11,24 @@ on:
 jobs:
   download-and-archive:
     runs-on: ubuntu-latest
-    # 为了让 push 能够成功，需要 contents: write 权限
+    # 需要写入仓库的权限才能 push
     permissions:
       contents: write
 
     steps:
       # -------------------------------------------------
-      # 1️⃣ Checkout（保留我们刚才新建文件的 mtime）
+      # 1️⃣ Checkout（保持推送凭证）
       # -------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # persist-credentials: true  # 只在需要推送时才打开，这里放在后面的 push 步骤里使用
-          # 关键：告诉 checkout 不要改动我们刚才创建的文件的修改时间
-          #（v4 开始默认就是不改动，除非你开了 preserve-file-modification:false）
-          # 为了保险起见，显式设为 false（即不保留）反而会把 mtime 重置为提交时间，
-          # 所以这里我们 **不设置** 该项，保持默认行为——即 **不改动工作树中已有文件的 mtime**。
-          # 如果你真的需要保留仓库中已有文件的原始 mtime，可以打开下面这行：
-          # preserve-file-modification: true
-          # 但在此场景下我们只关心 recién 创建的归档文件，默认即可。
+          persist-credentials: true   # 保持推送凭证
 
       # -------------------------------------------------
       # 2️⃣ 确保归档目录存在
       # -------------------------------------------------
       - name: Create archive directories
-        run: |
-          mkdir -p archive/cn
-          mkdir -p en   # 这里其实是 archive/en，下面保持一致
-          mkdir -p archive/en
+        run: mkdir -p archive/cn archive/en
 
       # -------------------------------------------------
       # 3️⃣ 下载中文版并生成带日期的副本
@@ -47,7 +37,6 @@ jobs:
         run: |
           curl -s -o bing-wallpaper-cn.md \
             https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/zh-cn/bing-wallpaper.md
-
           TODAY=$(date +'%Y-%m-%d')
           cp bing-wallpaper-cn.md "archive/cn/bing-wallpaper-cn-$TODAY.md"
 
@@ -58,49 +47,29 @@ jobs:
         run: |
           curl -s -o bing-wallpaper-en.md \
             https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/bing-wallpaper.md
-
           TODAY=$(date +'%Y-%m-%d')
           cp bing-wallpaper-en.md "archive/en/bing-wallpaper-en-$TODAY.md"
 
       # -------------------------------------------------
-      # 5️⃣ 删除超过 30 天的归档（使用 -newermt，不受 mtime 重置影响）
+      # 5️⃣ 删除超过 30 天的归档（保持原有 -mtime 写法，若想改为 -newermt 请参考之前的说明）
       # -------------------------------------------------
       - name: Clean up old archives
-        # 显式设定时区为 UTC，确保 date -u 与 runner 时间基准一致
-        env:
-          TZ: UTC
         run: |
-          # 计算“30 天前 00:00:00”（UTC），用作基准点
-          THIRTY_DAYS_AGO=$(date -u -d "30 days ago" +'%Y-%m-%d %H:%M:%S')
-          echo "🗑️  Deleting files older than $THIRTY_DAYS_AGO (UTC)"
-
-          # 中文归档
-          find archive/cn/ -type f -name "bing-wallpaper-cn-*.md" \
-                ! -newermt "$THIRTY_DAYS_AGO" -delete -print
-
-          # 英文归档
-          find archive/en/ -type f -name "bing-wallpaper-en-*.md" \
-                ! -newermt "$THIRTY_DAYS_AGO" -delete -print
+          # 删除30天前的中文归档
+          find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +30 -delete
+          # 删除30天前的英文归档
+          find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
 
       # -------------------------------------------------
       # 6️⃣ 提交并推送更改
       # -------------------------------------------------
       - name: Commit and push changes
         env:
-          # 使用你在 Secrets 中配置的 PAT（具有 repo 写权限）
           GH_TOKEN: ${{ secrets.PAT }}
         run: |
-          git config --local user.email "ju.moon@qq.com"
+          git config --local user.email "kkkkkk@qq.com"
           git config --local user.name "GitHub Actions Bot"
-
-          # 把今天刚生成的两个文件以及 archive/ 目录的变动全部加入
           git add bing-wallpaper-*.md archive/
-          # 如果没有任何变动，commit 会失败；我们捕获失败并仅输出提示
-          if ! git commit -m "Auto-update: Latest wallpapers (CN+EN) + Archives"; then
-            echo "✅ No changes to commit"
-            exit 0
-          fi
-
-          # 推送（使用 token 身份验证）
-          git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/bing-wallpaper.git
-
+          # 如果没有变动则不报错，直接结束本步骤
+          git commit -m "Auto-update: Latest wallpapers (CN+EN) + Archives" || echo "No changes to commit"
+          git push https://${{ env.GH_TOKEN }}@github.com/jumoon2023/kkkkkkk.git
