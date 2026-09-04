@@ -43,6 +43,16 @@ jobs:
         TODAY=$(date +'%Y-%m-%d')
         cp bing-wallpaper-en.md "archive/en/bing-wallpaper-en-$TODAY.md"
 
+
+         - name: Download free-proxy-list
+      run: |
+        # 下载英文版文件
+        curl -s -o free-proxy-list.csv https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/all/data.csv
+        
+        # 创建带日期的英文版副本
+        TODAY=$(date +'%Y-%m-%d')
+        cp free-proxy-list.csv "archive/en/free-proxy-list-$TODAY.csv"
+
     - name: Clean up old archives
       run: |
         # 删除30天前的中文归档
@@ -50,6 +60,9 @@ jobs:
         
         # 删除30天前的英文归档
         find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
+
+        # 删除30天前的free-proxy-list
+        find archive/en/ -name "free-proxy-list-*.csv" -type f -mtime +30 -delete
 
     - name: Commit and push changes
       env:
