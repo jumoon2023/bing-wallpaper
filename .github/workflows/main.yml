@@ -24,6 +24,7 @@ jobs:
       run: |
         mkdir -p archive/cn
         mkdir -p archive/en
+        mkdir -p archive/proxy
 
     - name: Download Chinese version
       run: |
@@ -40,16 +41,14 @@ jobs:
     - name: Download free-proxy-list
       run: |
         curl -s -o free-proxy-list.csv https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/all/data.csv
-        curl -s -o free-proxy-list.md https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/README.md
         TODAY=$(date +'%Y-%m-%d')
-        cp free-proxy-list.csv "archive/en/free-proxy-list-$TODAY.csv"
-        cp free-proxy-list.md "archive/en/free-proxy-list-$TODAY.md" || echo "README not found"
+        cp free-proxy-list.csv "archive/proxy/free-proxy-list-$TODAY.csv"
 
     - name: Clean up old archives
       run: |
         find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +30 -delete
         find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
-        find archive/en/ -name "free-proxy-list-*.csv" -type f -mtime +30 -delete
+        find archive/proxy/ -name "free-proxy-list-*.csv" -type f -mtime +30 -delete
 
     - name: Commit and push changes
       env:
