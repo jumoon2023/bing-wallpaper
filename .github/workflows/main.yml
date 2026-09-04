@@ -40,7 +40,7 @@ jobs:
 
     - name: Download free-proxy-list
       run: |
-        curl -s -o "proxy-list.csv" https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/all/data.csv
+        curl -s -o "free-proxy-list.csv" https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/all/data.csv
         TODAY=$(date +'%Y-%m-%d')
         cp free-proxy-list.csv "archive/proxy/free-proxy-list-$TODAY.csv"
 
