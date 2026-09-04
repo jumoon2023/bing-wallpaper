@@ -2,9 +2,9 @@ name: Download and Archive Wallpapers
 
 on:
   schedule:
-    - cron:  '12 7 * * *' #北京时间 15:12
-    - cron:  '12 16 * * *' #北京时间 00:12（次日）
-    - cron:  '12 0 * * *' #北京时间 08:12
+    - cron: '12 7 * * *'    # UTC 07:12 = 北京时间 15:12 ✓
+    - cron: '12 16 * * *'   # UTC 16:12 = 北京时间 00:12 (次日) ✓
+    - cron: '12 0 * * *'    # UTC 00:12 = 北京时间 08:12 ✓
   workflow_dispatch:     # 允许手动触发
 
 jobs:
@@ -27,41 +27,28 @@ jobs:
 
     - name: Download Chinese version
       run: |
-        # 下载中文版文件
         curl -s -o bing-wallpaper-cn.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/zh-cn/bing-wallpaper.md
-        
-        # 创建带日期的中文版副本
         TODAY=$(date +'%Y-%m-%d')
         cp bing-wallpaper-cn.md "archive/cn/bing-wallpaper-cn-$TODAY.md"
 
     - name: Download English version
       run: |
-        # 下载英文版文件
         curl -s -o bing-wallpaper-en.md https://raw.githubusercontent.com/niumoo/bing-wallpaper/refs/heads/main/bing-wallpaper.md
-        
-        # 创建带日期的英文版副本
         TODAY=$(date +'%Y-%m-%d')
         cp bing-wallpaper-en.md "archive/en/bing-wallpaper-en-$TODAY.md"
 
-
-         - name: Download free-proxy-list
+    - name: Download free-proxy-list
       run: |
-        # 下载英文版文件
         curl -s -o free-proxy-list.csv https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/all/data.csv
-        
-        # 创建带日期的英文版副本
+        curl -s -o free-proxy-list.md https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/README.md
         TODAY=$(date +'%Y-%m-%d')
         cp free-proxy-list.csv "archive/en/free-proxy-list-$TODAY.csv"
+        cp free-proxy-list.md "archive/en/free-proxy-list-$TODAY.md" || echo "README not found"
 
     - name: Clean up old archives
       run: |
-        # 删除30天前的中文归档
         find archive/cn/ -name "bing-wallpaper-cn-*.md" -type f -mtime +30 -delete
-        
-        # 删除30天前的英文归档
         find archive/en/ -name "bing-wallpaper-en-*.md" -type f -mtime +30 -delete
-
-        # 删除30天前的free-proxy-list
         find archive/en/ -name "free-proxy-list-*.csv" -type f -mtime +30 -delete
 
     - name: Commit and push changes
